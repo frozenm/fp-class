@@ -261,19 +261,33 @@ pow a n
   | otherwise = error "n should be >= 0"
 
 -- г) Пользуясь ранее написанной функцией pow, вычислить сумму: 1^k + 2^k + ... + n^k.
-sum_nk = undefined
+sum_nk :: Double -> Int -> Double
+sum_nk 1 k = pow 1 k
+sum_nk n k = pow n k + sum_nk (n-1) k
 
 -- д) Сумма факториалов чисел от 1 до n.
+sum_fact :: Int -> Int
 sum_fact 1 = 1
-sum_fact n = undefined
+sum_fact n = fact n + sum_fact (n-1) 
   where
-    fact n = undefined
+    fact 0 = 1
+    fact n = n * fact (n-1)
 
 -- е) Количество цифр целого числа
-number_digits = undefined
+number_digits :: Int -> Int
+number_digits a
+  | div a 10 == 0 = 1
+  | otherwise = 1 + number_digits (div a 10)
 
 -- ж) Проверить, является ли заданное число простым.
-isPrime = undefined
+isPrime :: Int -> Bool
+isPrime 0 = False
+isPrime 1 = False
+isPrime 2 = True
+isPrime a = notDiv a (a-1)
+  where
+    notDiv a 2 = if (mod a 2 == 0) then False else True
+    notDiv a n = if (mod a n /= 0 && notDiv a (n-1)) then True else False
 
 -- 8) Разное
 
@@ -284,7 +298,12 @@ isPrime = undefined
   не делятся на 400 (например, годы 300, 1300 и 1900 не являются високосными,
   а 1200 и 2000 — являются).
 -}
-
-nDays year = undefined
+nDays :: Int -> Int
+nDays year 
+  | isLeap year = 366
+  | otherwise = 365
   where
-    isLeap = undefined
+    isLeap y 
+      | mod y 4 == 0 && mod y 100 == 0 && mod y 400 /= 0 = False
+      | mod y 4 == 0 = True
+      | otherwise = False
