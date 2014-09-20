@@ -84,15 +84,58 @@ combine_plus (x:xs) (y:ys) = undefined
 -- Написать функцию, которая разбивает список на два подсписка: элементы из начала списка,
 -- совпадающие с первым элементом, и все остальные элементы, например:
 -- [1,1,1,2,3,1] -> ([1,1,1], [2,3,1]).
+divide :: Eq a => [a] -> ([a], [a])
+divide (x:xs) = divide' ([x], xs)
+  where
+    divide' ((x:xs), (y:ys))
+      | x == y = divide' ((x:xs) ++ [y], ys)
+      | otherwise = ((x:xs), (y:ys)) 
 
 --3
 -- Даны типовые аннотации функций. Попытайтесь догадаться, что они делают, и напишите их
 -- рекурсивные реализации (если вы можете предложить несколько вариантов, реализуйте все):
--- а) [a] -> Int -> a
--- б) Eq a => [a] -> a -> Bool
--- в) [a] -> Int -> [a]
--- г) a -> Int -> [a]
--- д) [a] -> [a] -> [a]
+-- а) Доступ к элементу по индексу
+elemAt :: [a] -> Int -> a
+elemAt [] _ = error "n should be < length"
+elemAt (x:xs) n
+  | n == 0 = x
+  | otherwise = elemAt xs (n-1) 
+
+-- б) Проверка, есть ли такой элемент в списке
+contains :: Eq a => [a] -> a -> Bool
+contains [] elem = False
+contains (x:xs) elem
+  | x == elem = True
+  | otherwise = contains xs elem
+
+-- в) Первые n элементов списка
+first' :: [a] -> Int -> [a]
+first' [] _ = []
+first' (x:xs) n
+  | n < 0 = error "n should be >= 0"
+  | n == 0 = []
+  | otherwise = x : first' xs (n-1)
+
+-- г) Аналог стандартной функции repeat
+repeat' :: a -> Int -> [a]
+repeat' a n 
+  | n == 0 = []
+  | n < 0 = error "n should be >= 0"
+  | otherwise = a : repeat' a (n-1)
+
+-- д) Конкатенация списков
+concat' :: [a] -> [a] -> [a]
+concat' [] ys = ys
+concat' (x:xs) ys = x : concat' xs ys
+
 -- е) Eq a => [a] -> [[a]]
--- ж) [a] -> [(Int, a)]
+
+-- ж) Пронумеровывает элементы списка
+numbering :: [a] -> [(Int, a)]
+numbering (x:xs) = number (x:xs) 0
+  where
+    number [] n = []
+    number (x:xs) n = (n,x) : number xs (n+1)
+
 -- з) Eq a => [a] -> [a]
+
