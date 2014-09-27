@@ -1,3 +1,4 @@
+import Data.Char
 {-
 Явная рекурсия в решениях хотя и допускается, но не приветствуется. Старайтесь обходиться стандартными
 функциями, используя при этом создание функций «на лету». Пытайтесь максимально упростить уже написанные
@@ -17,7 +18,34 @@
 -}
 
 f11a :: Integral a => [a] -> [a]
-f11a = map undefined
+f11a = map (*2)
+
+f11b :: Integral a => [a] -> [a]
+f11b = map doubleEven 
+  where
+    doubleEven a
+      | a `mod` 2 == 0 = a * 2
+      | otherwise = a
+
+f11c :: Integral a => [a] -> [a]
+f11c = map zeroOdd
+  where
+    zeroOdd a
+      | a `mod` 2 /= 0 = 0
+      | otherwise = a
+
+f11d :: Integral a => a -> [a] -> [a]
+f11d k = filter (<=k)
+
+f11e :: Integral a => [a] -> [a]
+f11e = filter (<0)
+
+f11f :: Integral a => [a] -> [a]
+f11f = filter notPosEven
+  where
+    notPosEven a
+      | (a > 0) && (a `mod` 2 == 0) = False
+      |otherwise = True
 
 {-
  1.2 Дан список декартовых координат точек на плоскости (пар вещественных чисел).
@@ -25,6 +53,15 @@ f11a = map undefined
   a) отфильтровать список так, чтобы в нём остались точки из заданной координатной четверти;
   b) преобразовать декартовы координаты в полярные.
 -}
+
+f12a :: Integer -> [(Double, Double)] -> [(Double, Double)]
+f12a 1 = (filter (((>0).fst)).(filter ((>0).snd))) 
+f12a 2 = (filter (((<0).fst)).(filter ((>0).snd))) 
+f12a 3 = (filter (((<0).fst)).(filter ((<0).snd))) 
+f12a 4 = (filter (((>0).fst)).(filter ((<0).snd)))
+f12a _ = error "Wrong quarter!" 
+
+f12b = undefined
 
 {-
  1.3 Дан список слов.
@@ -34,7 +71,13 @@ f11a = map undefined
 -}
 
 f13a :: [String] -> [String]
-f13a = map undefined
+f13a = map (map toUpper)
+
+f13b :: Int -> [String] -> [String]
+f13b l = filter ((==l).length) 
+
+f13c :: Char -> [String] -> [String]
+f13c c = filter ((==c).head) 
 
 {-
 2. Формирование числовых последовательностей (iterate).
@@ -46,7 +89,16 @@ f13a = map undefined
 -}
 
 nats :: [Integer]
-nats = iterate undefined 0
+nats = iterate (+1) 0
+
+evens :: [Integer]
+evens = iterate (+2) 0
+
+seq' :: [Double]
+seq' = iterate ((/2).(+1)) 1
+
+alphEng :: [Char]
+alphEnd = undefined
 
 {-
 3. Группировка списков.
