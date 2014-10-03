@@ -24,6 +24,35 @@
      функции должно быть значение, возвращаемое по умолчанию).
 -}
 
+f1a :: [Int] -> Int
+f1a = foldl (\c x -> c + if even x then x else 0) 0
+f1a_test1 = f1a [1,2,3,4,5,6] == 12
+f1a_test2 = f1a [3,(-2),8,7,11] == 6
+f1a_test3 = f1a [3,7,9] == 0
+
+f1b :: [Double] -> (Double, Double)
+f1b = foldl (\(s,p) x -> (s+x, p*x)) (0,1)
+f1b_test1 = f1b [1..6] == (21,720)
+f1b_test2 = f1b [3.2, 2.4, 5.0] == (10.6,38.4)
+f1b_test3 = f1b [3.0,0.0,9.2] == (12.2,0)
+
+f1c :: [Double] -> Double
+f1c xs = snd res / (fst res)
+  where
+    res = foldl (\(c,a) x -> (c+1, a+x)) (0,0) xs
+f1c_test1 = f1c [1,2,3,4,5,6] == 3.5
+f1c_test2 = f1c [3,(-2),8,7,11] == 5.4
+f1c_test3 = f1c [3,0,9] == 4
+
+f1d :: Ord a => [a] -> a
+f1d = foldl1 min 
+f1d_test1 = f1d [1,2,3,4,5,6] == 1
+f1d_test2 = f1d [3,(-2),8,7,11] == (-2)
+f1d_test3 = f1d [3,0,9] == 0
+
+f1e :: [Int] -> Int
+f1e = undefined
+
 {-
  2. Свёртки, формирующие списки
   a) Сформировать список, содержащий каждый второй элемент исходного.
@@ -42,6 +71,32 @@
      заданной функции двух аргументов к соответствующим элементам исходных списков.
 -}
 
+f2a :: [a] -> [a]
+f2a xs = snd $ foldl (\(i,acc) x -> if even i then (i+1, acc ++ [x]) else (i+1, acc)) (1,[]) xs
+f2a_test1 = f2a [1,2,3,4,5,6] == [2,4,6]
+f2a_test2 = f2a [3,(-2),8,7,11] == [(-2),7]
+f2a_test3 = f2a [3,0,9] == [0]
+
+f2b :: Int -> [a] -> [a]
+f2b n xs = snd $ foldl (\(i,acc) x -> if i <= n then (i+1, acc ++ [x]) else (i+1, acc)) (1,[]) xs
+f2b_test1 = f2b 3 [1,2,3,4,5,6] == [1,2,3]
+f2b_test2 = f2b 4 [3,(-2),8,7,11] == [3,(-2),8,7]
+f2b_test3 = f2b 1 [3,0,9] == [3]
+
+f2c :: Int -> [a] -> [a]
+f2c n xs = snd $ foldr (\x (i,acc) -> if i <= n then (i+1, x:acc) else (i+1, acc)) (1,[]) xs
+f2c_test1 = f2c 3 [1,2,3,4,5,6] == [4,5,6]
+f2c_test2 = f2c 4 [3,(-2),8,7,11] == [(-2),8,7,11]
+f2c_test3 = f2c 1 [3,0,9] == [9]
+
+f2d :: Ord a => [a] -> [a]
+f2d [] = []
+f2d (x:xs) = snd $ foldl (\(x,acc) y -> if y > x then (y, acc ++ [y]) else (y, acc)) (x,[]) xs
+f2d_test1 = f2d [1..6] == [2..6]
+f2d_test2 = f2d [3,(-2),8,7,11] == [8,11]
+f2d_test3 = f2d [3,0,9] == [9]
+
+
 {-
  3. Использование свёртки как носителя рекурсии (для запуска свёртки можно использовать список типа [1..n]).
   a) Найти сумму чисел от a до b.
@@ -51,6 +106,23 @@
      n слагаемых).
   e) Проверить, является ли заданное целое число простым.
 -}
+
+f3a :: Int -> Int -> Int
+f3a a b = foldl (+) 0 [a..b]
+f3a_test1 = f3a 5 12 == 68
+f3a_test2 = f3a 1 5 == 15
+f3a_test3 = f3a (-3) 10 == 49
+
+f3b :: Int -> Int -> Int
+f3b a b = foldl (+) 0 (scanl (*) start [a+1..b])
+  where
+    start = foldl (*) 1 [2..a]
+f3b_test1 = f3b 1 4 == 33
+f3b_test2 = f3b 3 5 == 150
+f3b_test3 = f3b 2 6 == 872
+
+f3c :: Int -> [Int]
+f3c n = undefined
 
 {-
  4. Решить задачу о поиске пути с максимальной суммой в треугольнике (см. лекцию 3) при условии,
