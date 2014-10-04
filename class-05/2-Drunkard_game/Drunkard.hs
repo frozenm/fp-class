@@ -4,19 +4,28 @@ module Drunkard where
 
 {-
   1. Определить типы данных, необходимые для представления игральной карты в игре «Пьяница»,
-  учитывая, что всего в колоде 54 карты.
+  учитывая, что всего в колоде 52 карты.
 -}
 
-data Suit
+data Suit = Spades | Clubs | Diamonds | Hearts
+  deriving (Show, Eq)
 
-data Value
+data Value = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace
+  deriving (Show, Eq, Ord)
 
 data Card = Card Value Suit
+  deriving (Show, Eq)
+
+value :: Card -> Value
+value (Card v _) = v
+
+suit :: Card -> Suit
+suit (Card _ s) = s
 
 -- 2. Определить функцию, проверяющую, что две переданные ей карты одной масти.
 
 sameSuit :: Card -> Card -> Bool
-sameSuit = undefined
+sameSuit c1 c2 = suit c1 == suit c2 
 
 {-
   3. Определить функцию, проверяющую, что переданная ей первой карта старше второй
@@ -25,7 +34,7 @@ sameSuit = undefined
 -}
 
 beats :: Card -> Card -> Ordering
-c1 `beats` c2 = undefined
+c1 `beats` c2 = compare (value c1) (value c2)
 
 {-
   4. Определить функцию, которая по паре списков карт возвращает новую пару списков карт
@@ -38,7 +47,12 @@ c1 `beats` c2 = undefined
 -}
 
 game_round :: ([Card], [Card]) -> ([Card], [Card])
-game_round = undefined
+game_round (xs,ys) = game_round' [] xs ys 
+  where
+    game_round' prev (x:xs) (y:ys)
+      | x `beats` y == GT = (xs ++ prev ++ [x,y], ys)
+      | x `beats` y == LT = (xs, ys ++ prev ++ [x,y])
+      | otherwise = game_round' [x,y] xs ys
 
 {-
   5. Определить функцию, которая по паре списков возвращает количество раундов, необходимых
