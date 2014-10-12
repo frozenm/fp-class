@@ -2,6 +2,9 @@
 
 module GrahamScan where
 
+import Data.List
+import Data.Function
+
 -- 1. Определить тип Point для хранения информации о точке на вещественной плоскости.
 
 data Point = Point {
@@ -44,9 +47,36 @@ directions (x0:x1:xs) = snd $ foldl (\((a,b),acc) c -> ((b,c), acc ++ [turn a b 
   http://www.youtube.com/watch?v=BTgjXwhoMuI
 -}
 
+-- Самая левая нижняя точка
+firstPoint :: [Point] -> Point
+firstPoint [p] = p
+firstPoint (p:ps) = minY p (firstPoint ps) 
+  where
+    minY a b
+        | y a > y b = b
+        | y a < y b = a
+        | x a < x b = a
+        | otherwise = b
+
+-- Сортировка точек по углу
+sortAngle :: Point -> [Point] -> [Point]
+sortAngle x0 xs = tail (sortBy (compare `on` compkey x0) xs) 
+  where
+    compkey a b = (atan2 (y b - y a) (x b - x a), abs (x b - x a))
+
 graham_scan :: [Point] -> [Point]
-graham_scan = undefined
+graham_scan [] = []
+graham_scan [x] = [x]
+graham_scan [x0, x1] = [x0, x1]
+graham_scan points = foldl (\(x2:x1:xs) x3 -> if (turn x1 x2 x3 == Right_Rotate) then (x3:x1:xs) else (x3:x2:x1:xs)) (head sortedList : [p]) (tail sortedList) 
+  where
+    sortedList = sortAngle p points
+    p = firstPoint points
 
 {-
   5. Приведите несколько примеров работы функции graham_scan.
 -}
+
+graham_scan_test1 = graham_scan [(Point 2 5), (Point 5 2), (Point 1 2), (Point 4 4), (Point 6 5)] == [(Point 2 5), (Point 6 5), (Point 5 2), (Point 1 2)]
+
+graham_scan_test2 = graham_scan [(Point 2 4), (Point 6 2), (Point 4 6), (Point 1 1), (Point 4 3), (Point 5 5), (Point 2 5)] == [(Point 2 5), (Point 4 6), (Point 5 5), (Point 6 2), (Point 1 1)]
