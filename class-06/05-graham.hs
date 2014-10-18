@@ -9,5 +9,20 @@
 -}
 
 import GrahamScan
+import System.Environment
 
-main = undefined
+convertToPoints :: [(Double, Double)] -> [Point]
+convertToPoints = map (\(x,y) -> (Point x y)) 
+
+pointToString :: [Point] -> [String]
+pointToString = map (\(Point x y) -> "(" ++ show x ++ " ; " ++ show y ++ ")")
+
+findConvexHull :: FilePath -> FilePath -> IO ()
+findConvexHull fname1 fname2 = do
+  contents <- readFile fname1
+  let hull = graham_scan $ convertToPoints $ map (\x -> read x :: (Double, Double)) $ lines contents
+  writeFile fname2 $ unlines $ pointToString hull
+
+main = do
+  (arg1:arg2:_) <- getArgs
+  findConvexHull arg1 arg2
