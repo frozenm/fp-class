@@ -18,11 +18,24 @@ nub_set = Set.size
 nub_list :: [Int] -> Int
 nub_list = length . nub
 
-nub_seq :: Seq.Seq a -> Int
-nub_seq = undefined
+-- Удаляем из последовательности все элементы == e 
+delR :: Int -> Seq.Seq Int -> Seq.Seq Int
+delR e s
+    | Seq.length xs == 0 = if x == e then Seq.empty else Seq.singleton x 
+    | otherwise = if x == e then delR e xs else x Seq.<| (delR e xs)
+    where
+      (x Seq.:< xs) = Seq.viewl s
+
+nub_seq :: Seq.Seq Int -> Int
+nub_seq s = Seq.length $ nub_seq' s
+  where
+    nub_seq' s
+      | Seq.length s == 0 = Seq.empty 
+      | Seq.length s == 1 = s
+      | otherwise = let (x Seq.:< xs) = Seq.viewl s in x Seq.<| (nub_seq' (delR x xs))
 
 nub_arr :: Array Int Int -> Int
-nub_arr = undefined
+nub_arr a = length $ nub $ Data.Array.IArray.elems a  
 
 main = do
   [fname] <- getArgs
