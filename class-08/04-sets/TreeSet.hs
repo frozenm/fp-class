@@ -1,4 +1,4 @@
-module TreeSet (Set, empty, isEmpty, add, contains) where
+module TreeSet (Set, empty, isEmpty, add, contains, remove) where
 
 import AbstractSet
 import BST
@@ -14,3 +14,5 @@ instance AbstractSet Set where
   add (SetImpl t) x = SetImpl (insertBST x t)
 
   contains (SetImpl t) x = containsBST x t
+
+  remove (SetImpl t) x = SetImpl (deleteBST x t)

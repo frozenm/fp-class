@@ -5,3 +5,4 @@ class AbstractSet a where
   isEmpty :: a -> Bool
   add :: a -> Int -> a
   contains :: a -> Int -> Bool
+  remove :: a -> Int -> a

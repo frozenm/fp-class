@@ -1,4 +1,4 @@
-module ListSet (Set, empty, isEmpty, add, contains) where
+module ListSet (Set, empty, isEmpty, add, contains, remove) where
 
 import AbstractSet
 import Data.List
@@ -15,3 +15,5 @@ instance AbstractSet Set where
     | otherwise = SetImpl (x : xs)
 
   contains (SetImpl xs) x = elem x xs
+
+  remove (SetImpl xs) x = SetImpl (delete x xs)

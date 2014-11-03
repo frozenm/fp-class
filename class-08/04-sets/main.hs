@@ -25,7 +25,7 @@ check2 s list = contains set (head list) && contains set (head $ tail list)
 
 -- Третья проверка
 check3 :: (AbstractSet a) => a -> Bool
-check3 s = not $ contains (add (add (add s 2) 2) 8) 7 
+check3 s = not $ contains (remove (add (add (add s 2) 2) 8) 2) 2 
 
 main = do
   print $ check1 (empty :: LS.Set) && check1 (empty :: TS.Set)
