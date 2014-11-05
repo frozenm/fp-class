@@ -1,4 +1,5 @@
 import System.Environment
+import Data.Functor
 
 {-
   Напишите функцию reduce, принимающую один целочисленный аргумент a и возвращающую 0,
@@ -7,7 +8,10 @@ import System.Environment
 -}
 
 reduce :: Integral a => a -> a
-reduce = undefined
+reduce a 
+  | a `mod` 3 == 0 = 0
+  | odd a = a^2
+  | otherwise = a^3
 
 {-
   Напишите функцию, применяющую функцию reduce заданное количество раз к значению в контексте,
@@ -15,7 +19,8 @@ reduce = undefined
 -}
 
 reduceNF :: (Functor f, Integral a) => Int -> f a -> f a
-reduceNF = undefined
+--reduceNF n fa = last $ take n $ iterate (fmap reduce) $ fmap reduce fa
+reduceNF n fa = foldl (\acc _ -> fmap reduce acc) fa [1..n]
 
 {-
   Реализуйте следующие функции-преобразователи произвольным, но, желательно, осмысленным и
@@ -23,7 +28,7 @@ reduceNF = undefined
 -}
 
 toList :: Integral a => [(a, a)]  -> [a]
-toList = undefined
+toList = foldr (\(x,y) acc -> x : y : acc) []
 
 toMaybe :: Integral a => [(a, a)]  -> Maybe a
 toMaybe = undefined
