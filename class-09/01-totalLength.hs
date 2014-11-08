@@ -1,4 +1,5 @@
 import System.Environment
+import Control.Monad.Instances
 
 {-
   Написать функцию, которая по заданному списку строк возвращает сумму длин всех строк.
@@ -52,6 +53,6 @@ main = do
   res2 <- fmap totalLength $ fmap words $ readFile fname
   putStrLn $ "Length of text: " ++ show res2 
 
-  putStrLn $ "Length of build1: " ++ show (fmap totalLength $ build1 (read c) (read n))
+  putStrLn $ "Length of build1: " ++ show (fmap totalLength $ build1 (head c) (read n))
 
-  putStrLn $ "Length of build2: " ++ show (fmap totalLength $ build2 (read c) (read n))
+  putStrLn $ "Length of build2: " ++ show (fmap totalLength $ build2 (head c) (read n))

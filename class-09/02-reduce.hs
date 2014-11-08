@@ -1,5 +1,7 @@
 import System.Environment
-import Data.Functor
+import Control.Monad.Instances
+import Data.Maybe
+import System.Random
 
 {-
   Напишите функцию reduce, принимающую один целочисленный аргумент a и возвращающую 0,
@@ -19,7 +21,6 @@ reduce a
 -}
 
 reduceNF :: (Functor f, Integral a) => Int -> f a -> f a
---reduceNF n fa = last $ take n $ iterate (fmap reduce) $ fmap reduce fa
 reduceNF n fa = foldl (\acc _ -> fmap reduce acc) fa [1..n]
 
 {-
@@ -28,17 +29,23 @@ reduceNF n fa = foldl (\acc _ -> fmap reduce acc) fa [1..n]
 -}
 
 toList :: Integral a => [(a, a)]  -> [a]
-toList = foldr (\(x,y) acc -> x : y : acc) []
+toList = foldr (\(x,y) acc -> (max x y) : acc) []
 
 toMaybe :: Integral a => [(a, a)]  -> Maybe a
-toMaybe = undefined
+toMaybe [] = Nothing
+toMaybe xs = Just (maximum $ toList xs)
 
 toEither :: Integral a => [(a, a)]  -> Either String a
-toEither = undefined
+toEither [] = Left "Empty list"
+toEither xs = Right (maximum $ toList xs)
 
 -- воспользуйтесь в этой функции случайными числами
-toIO :: Integral a => [(a, a)]  -> IO a
-toIO = undefined
+toIO :: (Random a, Integral a) => [(a, a)]  -> IO a
+-- дописать
+toIO xs = do
+  gen <- newStdGen
+  let x = fst $ randomR (1, 100) gen
+  return $ max x (maximum $ toList xs)
 
 {-
   В параметрах командной строки задано имя текстового файла, в каждой строке
@@ -50,19 +57,34 @@ toIO = undefined
 -}
 
 parseArgs :: [String] -> (FilePath, Int)
-parseArgs = undefined
+parseArgs str = (head str, read $ last str)
 
 readData :: FilePath -> IO [(Int, Int)]
-readData = undefined
+readData fname = do
+  content <- readFile fname
+  return $ foldr (\x acc -> (parse x) : acc) [] $ lines content 
+  where
+    parse x = let l = words x in (read $ head l, read $ last l)
 
 main = do
   (fname, n) <- parseArgs `fmap` getArgs
   ps <- readData fname
-  undefined
+  print $ reduceNF n (toList ps)
+  print $ reduceNF n (toMaybe ps)
   print $ reduceNF n (toEither ps)
   reduceNF n (toIO ps) >>= print
 
 {-
   Подготовьте несколько тестовых файлов, демонстрирующих особенности различных контекстов.
   Скопируйте сюда результаты вызова программы на этих файлах.
+
+  test1.txt 3 
+  [0,0,0,0,1744830464,0,0,-1744830464]
+  Just 0
+  Right 0
+  0
+
+
+  
+
 -}
