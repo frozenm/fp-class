@@ -41,7 +41,7 @@ toEither xs = Right (maximum $ toList xs)
 
 -- воспользуйтесь в этой функции случайными числами
 toIO :: (Random a, Integral a) => [(a, a)]  -> IO a
--- дописать
+toIO [] = return 0
 toIO xs = do
   gen <- newStdGen
   let x = fst $ randomR (1, 100) gen
@@ -69,6 +69,7 @@ readData fname = do
 main = do
   (fname, n) <- parseArgs `fmap` getArgs
   ps <- readData fname
+  print ps
   print $ reduceNF n (toList ps)
   print $ reduceNF n (toMaybe ps)
   print $ reduceNF n (toEither ps)
@@ -78,13 +79,29 @@ main = do
   Подготовьте несколько тестовых файлов, демонстрирующих особенности различных контекстов.
   Скопируйте сюда результаты вызова программы на этих файлах.
 
-  test1.txt 3 
-  [0,0,0,0,1744830464,0,0,-1744830464]
+  test1.txt 1
+  [(34,67),(897,123),(1,987),(3333,65),(234,45),(98,89),(33,33),(1086,2375),(74,2),(193,528),(345,90)]
+  [4489,0,0,0,0,941192,0,5640625,405224,0,0]
   Just 0
   Right 0
   0
 
+  test2.txt 2
+  []
+  []
+  Nothing
+  Left "Empty list"
+  0
+
+  test3.txt 1
+  [(59872,234),(23,12),(87,45),(97,12),(1234,846),(937,582),(5873,21)]
+  [214620547022848,529,0,9409,1879080904,877969,34492129]
+  Just 214620547022848
+  Right 214620547022848
+  214620547022848
+
+-}
+
 
   
 
--}
