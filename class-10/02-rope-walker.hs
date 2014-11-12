@@ -1,4 +1,5 @@
 import Control.Monad 
+import Control.Applicative
 {-
   Модифицируйте имеющуюся реализацию задачи о канатоходце (лекция 9) следующим образом:
   1) реализуйте загрузку входных данных из файла следующего вида:
@@ -25,23 +26,42 @@ type Pole = (Birds, Birds)
 
 balance = 3
 
-updatePole :: Pole -> Maybe Pole
-updatePole p = if unbalanced p then Nothing else Just p
+updatePole :: Pole -> Either String Pole
+updatePole p = if unbalancedL p then Left "Unbalanced to left" else if unbalancedR p then Left "Unbalanced to right" else Right p
   where
-    unbalanced (l, r) = abs (l - r) > balance
+    unbalancedL (l, r) = l - r > balance
+    unbalancedR (l, r) = r - l > balance 
 
-landLeft :: Birds -> Pole -> Maybe Pole
+landLeft :: Birds -> Pole -> Either String Pole
 landLeft n (left, right) = updatePole (left + n, right)
 
-landRight :: Birds -> Pole -> Maybe Pole
+landRight :: Birds -> Pole -> Either String Pole
 landRight n (left, right) = updatePole (left, right + n)
 
-banana :: Pole -> Maybe Pole
-banana = const Nothing
+landBoth :: Birds -> Pole -> Either String Pole
+landBoth n (left, right) = Right (left + n, right + n)
 
-tests = all test [1..3]
+unlandAll :: Pole -> Either String Pole
+unlandAll = const (Right (0, 0))
+
+banana :: Pole -> Either String Pole
+banana = const (Left "Banana on the pole")
+
+--Вычисляет результат по строке вида "R 1\nL 3\n ...", T - landBoth, U - unlandAll
+countResult :: String -> Either String Pole
+countResult str = foldr (<=<) return actionList (0, 0)
   where
-    test 1 = (return (0, 0) >>= landLeft 1 >>= landRight 4 
-              >>= landLeft (-1) >>= landRight (-2)) == Nothing
-    test 2 = (return (0, 0) >>= landRight 2 >>= landLeft 2 >>= landRight 2) == Just (2, 4)
-    test 3 = (return (0, 0) >>= landLeft 1 >>= banana >>= landRight 1) == Nothing
+    actionList = reverse $ map parse $ lines str
+    parse "B" = banana
+    parse "U" = unlandAll
+    parse str = let (a, n) = (head str, read $ drop 2 str :: Birds) in 
+                if a == 'R' then landRight n else 
+                if a == 'T' then landBoth n else landLeft n
+
+tests = all test [1..4]
+  where
+    test 1 = (return (0, 0) >>= landRight 2 >>= landLeft 1 >>= landRight 3) == Left "Unbalanced to right"
+    test 2 = (return (0, 0) >>= landRight 2 >>= landBoth 2 >>= landLeft 1) == Right (3, 4)
+    test 3 = (return (0, 0) >>= landLeft 1 >>= banana >>= landRight 1) == Left "Banana on the pole"
+    test 4 = (return (0, 0) >>= landLeft 1 >>= unlandAll >>= landBoth 2 ) == Right (2, 2)
+    --test 5 = (==) <$> ((readFile "pole.txt") >>= return . countResult) <*> pure (Right (2, 2))

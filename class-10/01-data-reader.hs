@@ -8,5 +8,31 @@
    (операции >>= и >>, функции ap, liftM и другие функции монадической обработки данных, использование
    блока do не допускается).
 -}
+import Control.Monad
+import Data.List
+import Data.Ord
 
-main = undefined
+data Student = Student {
+  name :: String
+  , age :: Int
+  , group :: (Int, Int) }
+
+instance Show Student where
+  show (Student n a (c, g)) = n ++ "\n" ++ (show a) ++ "\n" ++ (show c) ++ "." ++ (show g)
+
+-- Группирует список по 3 элемента
+groupBy3 :: [a] -> [[a]]
+groupBy3 [] = []
+groupBy3 xs = [take 3 xs] ++ (groupBy3 $ drop 3 xs)
+
+-- Чтение файла в список студентов
+loadFile :: FilePath -> IO [Student]
+loadFile fname = readFile fname >>= (return . (foldr (\x acc -> parse x : acc) []) . groupBy3 . lines)
+  where
+    parse [n, a, c] = Student n (read a) (read (take 1 c), read (drop 2 c))
+
+-- Запись в файл
+writeToFile :: FilePath -> [Student] -> IO ()
+writeToFile fname list = writeFile fname $ unlines $ map show list
+
+main = (++) `liftM` loadFile "students1.txt" `ap` loadFile "students2.txt" >>= writeToFile "students.txt" . sortBy (comparing name)

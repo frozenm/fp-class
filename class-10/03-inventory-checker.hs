@@ -19,7 +19,9 @@ data ArmorKit = ArmorKit ArmorKind [ArmorType]
    deriving (Show, Eq)
 
 loadInventory :: FilePath -> IO [ArmorItem]
-loadInventory = undefined
+loadInventory fname = (readFile fname) >>= return . map parse . lines
+  where
+    parse str = let (k, t) = span (/= ' ') str in ArmorItem (read k) (read t)
 
 buildArmorKit :: ArmorKind -> [ArmorItem] -> Maybe ArmorKit
 buildArmorKit = undefined
@@ -27,4 +29,4 @@ buildArmorKit = undefined
 buildKits :: [ArmorItem] -> Maybe [ArmorKit]
 buildKits = undefined
 
-main = (head `liftM` getArgs) >>= loadInventory >>= undefined >>= print
+main = undefined--(head `liftM` getArgs) >>= loadInventory >>= undefined
