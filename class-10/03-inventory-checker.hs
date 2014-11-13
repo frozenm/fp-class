@@ -1,5 +1,6 @@
 import Control.Monad
 import Data.List
+import Data.Maybe
 import System.Environment
 
 {-
@@ -24,9 +25,13 @@ loadInventory fname = (readFile fname) >>= return . map parse . lines
     parse str = let (k, t) = span (/= ' ') str in ArmorItem (read k) (read t)
 
 buildArmorKit :: ArmorKind -> [ArmorItem] -> Maybe ArmorKit
-buildArmorKit = undefined
+buildArmorKit kind items = if (length $ nub types) == 5 then Just (ArmorKit kind types) else Nothing
+  where
+    types = map (\(ArmorItem _ t) -> t) $ filter (\(ArmorItem k _) -> k == kind) items
 
 buildKits :: [ArmorItem] -> Maybe [ArmorKit]
-buildKits = undefined
+buildKits items = sequence $ filter (isJust) list
+  where
+    list = zipWith buildArmorKit [Chitin, Hide, Leather, Elven, Scaled, Glass, ImperialLight] (replicate 7 items)
 
-main = undefined--(head `liftM` getArgs) >>= loadInventory >>= undefined
+main = (head `liftM` getArgs) >>= loadInventory >>= print . buildKits

@@ -1,3 +1,6 @@
 {- Пользуясь списком как монадой, вычислите пересечение  заданных списков -}
-intersect :: Eq a => [[a]] -> [a]
-intersect = foldr undefined undefined
+import Data.List
+import Control.Monad
+
+intersect' :: Eq a => [[a]] -> [a]
+intersect' = foldr undefined []
