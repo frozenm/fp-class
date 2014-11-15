@@ -46,6 +46,7 @@ unlandAll = const (Right (0, 0))
 
 banana :: Pole -> Either String Pole
 banana = const (Left "Banana on the pole")
+ 
 
 --Вычисляет результат по строке вида "R 1\nL 3\n ...", T - landBoth, U - unlandAll
 countResult :: String -> Either String Pole
