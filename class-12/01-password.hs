@@ -11,21 +11,33 @@
 import Control.Monad
 import Control.Monad.Trans
 import Control.Monad.Trans.Maybe
+import Control.Monad.Reader
+import Control.Monad.Writer
 
 import Data.Char
 
-isValid :: String -> Bool
-isValid s = length s >= 8 && 
-                any isAlpha s && 
-                any isNumber s && 
-                any isPunctuation s
+getLength :: Reader String Int
+getLength = do
+  n <- ask
+  return $ read n
+
+getFlag :: Reader String Bool
+getFlag = do
+  n <- ask
+  return (if n == "true" then True else False)
+
+isValid :: String -> Int -> Bool -> Bool -> Bool -> Bool
+isValid s len f1 f2 f3 = (length s >= len) 
+                         && (if f1 then any isAlpha s else True) 
+                         && (if f2 then any isNumber s else True) 
+                         && (if f3 then any isPunctuation s else True)
 
 getValidPassword :: MaybeT IO String
-getValidPassword = do
+getValidPassword = undefined {-do
   lift $ putStrLn "Введите новый пароль:"
   s <- lift getLine
   guard (isValid s)
-  return s
+  return s-}
  
 askPassword :: MaybeT IO ()
 askPassword = do
