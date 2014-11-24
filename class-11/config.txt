@@ -1,0 +1,2 @@
+summand=3
+multiplier=2

@@ -17,22 +17,32 @@ data Config = Config {
   , multiplier :: Int
   , divisor :: Int} deriving Show
 
+-- Загружаем конфигурационный файл
 loadConfig :: FilePath -> IO Config
 loadConfig fname = do
   content <- readFile fname
   let xs = map (\str -> span (/= '=') str) $ lines content
-  let s = tail $ fromMaybe "0" $ lookup "summand" xs
-  let m = tail $ fromMaybe "1" $ lookup "multiplier" xs
-  let d = tail $ fromMaybe "1" $ lookup "divisor" xs
+  let s = tail $ fromMaybe "=0" $ lookup "summand" xs
+  let m = tail $ fromMaybe "=1" $ lookup "multiplier" xs
+  let d = tail $ fromMaybe "=1" $ lookup "divisor" xs
   return (Config (read s) (read m) (read d))
 
-{-
-doWork :: String -> Reader Config String
-doWork str = do
+-- Выполняем действия над числами
+doWork :: [Int] -> Reader Config [Int]
+doWork numbers = do
   (Config s m d) <- ask
-  return $ show s ++ " !! " ++ show m ++ " !! " ++ show d ++ " !! " ++ str
+  return $ map (\x -> (x + s) * m `div` d) numbers
+
+-- Считываем файл целых чисел
+parse :: String -> [Int]
+parse str = map read $ concat $ map words $ lines str
 
 main = do
   (x0 : x1 : []) <- getArgs
   content <- readFile x1
-  loadConfig x0 >>= print . runReader (doWork content)-}
+  loadConfig x0 >>= print . runReader (doWork $ parse content)
+
+{-
+  :main config.txt numbers.txt
+  [8,10,12,14,16,18,20,22,12,8,24,10]
+-}
