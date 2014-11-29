@@ -1,6 +1,7 @@
 import Parser
 import SimpleParsers
 import ParseNumbers
+import Control.Applicative hiding (many, optional)
 
 {- Напишите парсер для вещественных чисел. -}
 float :: Parser Float
