@@ -13,35 +13,31 @@ import Control.Monad.Trans
 import Control.Monad.Trans.Maybe
 import Control.Monad.Reader
 import Control.Monad.Writer
-
 import Data.Char
+import System.Environment
 
-getLength :: Reader String Int
-getLength = do
-  n <- ask
-  return $ read n
+isValid :: String -> [Int] -> Bool
+isValid s (len : f1 : f2 : f3 : _) = (length s >= len) 
+                         && (if f1 == 1 then any isAlpha s else True) 
+                         && (if f2 == 1 then any isNumber s else True) 
+                         && (if f3 == 1 then any isPunctuation s else True)
 
-getFlag :: Reader String Bool
-getFlag = do
-  n <- ask
-  return (if n == "true" then True else False)
+getValidPassword :: MaybeT (ReaderT [Int] (WriterT [String] IO)) String
+getValidPassword = do
+  xs <- ask
+  liftIO $ putStrLn "Введите новый пароль:"
+  s <- liftIO getLine
+  tell [s]
+  guard (isValid s xs)
+  return s
 
-isValid :: String -> Int -> Bool -> Bool -> Bool -> Bool
-isValid s len f1 f2 f3 = (length s >= len) 
-                         && (if f1 then any isAlpha s else True) 
-                         && (if f2 then any isNumber s else True) 
-                         && (if f3 then any isPunctuation s else True)
-
-getValidPassword :: MaybeT IO String
-getValidPassword = undefined {-do
-  lift $ putStrLn "Введите новый пароль:"
-  s <- lift getLine
-  guard (isValid s)
-  return s-}
- 
-askPassword :: MaybeT IO ()
+askPassword :: MaybeT (ReaderT [Int] (WriterT [String] IO)) ()
 askPassword = do
   value <- msum $ repeat getValidPassword
-  lift $ putStrLn "Сохранение в базе данных..."
+  liftIO $ putStrLn "Сохранение в базе данных..."
 
-main = runMaybeT askPassword
+-- Аргументами командой строки являются целые числа, где 1 - включение ограничения, 0 - выключение.
+main = do
+  args <- getArgs
+  (_, xs) <- runWriterT (runReaderT (runMaybeT askPassword) (map read args))
+  print xs
