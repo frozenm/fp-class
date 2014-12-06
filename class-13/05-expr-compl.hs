@@ -11,6 +11,27 @@ import Control.Monad
    проанализировать).
 -}
 
+countNumb :: Int -> Float
+countNumb 0 = 1.0
+countNumb x = 10.0 * countNumb (x `div` 10)
+
+float :: Parser Float
+float = (*) <$> minus <*> (number <|> fromIntegral <$> natural)
+  where
+    number = do
+      a <- natural
+      char '.'
+      b <- natural
+      return $ fromIntegral a + (fromIntegral b / countNumb b)
+    minus = (char '-' >> return (-1)) <|> return 1
+
+complex :: Parser (Float, Float)
+complex = bracket "(" ")" $ do
+  x <- token float
+  char ','
+  y <- token float
+  return $ (x, y)
+
 data Expr = Con Int | Bin Op Expr Expr
   deriving Show
 data Op = Plus | Minus | Mul | Div
